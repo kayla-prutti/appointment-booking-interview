@@ -39,7 +39,7 @@ and recovery when a slot is no longer available.
 | TODO 6 | `src/useBooking.ts` | Recover from `SLOT_UNAVAILABLE`, refresh and reselect |
 | TODO 7 | `src/useBooking.ts` | Start another booking and invalidate old requests |
 | TODO 8 | `src/App.tsx` | Focus after confirmation and slot conflicts |
-| TODO 9 | `src/booking.acceptance.test.ts` | Turn pending acceptance cases into real tests |
+| TODO 9 | `src/booking.acceptance.test.ts` | Extend the supplied acceptance tests with more edge cases |
 
 `src/mockApi.ts`, `src/types.ts`, the basic UI and styling are supplied. You may
 refactor the shell as needed. There is deliberately no solution implementation.
@@ -121,9 +121,22 @@ server validation, durable idempotency, authentication and patient time zones.
 ```bash
 npm run typecheck
 npm run build
-npm test
+npm test              # all tests; EXPECTED TO FAIL until you implement the TODOs
+npm run test:api      # supplied mock API only; expected to pass
+npm run test:acceptance  # your hook/UI behavior; expected to fail initially
 ```
 
-The **10 provided API tests** should pass immediately. The **9 pending acceptance
-tests** are your implementation work; they are placeholders, not passing UI tests.
+The **10 provided API tests** should pass immediately. The **9 real acceptance
+tests** exercise your actual hook and live interface; they should fail until you
+implement the booking TODOs. There are no skipped or `it.todo` cases.
+
+Each acceptance test names the relevant TODO numbers. Tests use an isolated mock
+server with zero delay and controlled promises for loading and race conditions.
+They do not mock your hook or use visual previews. Native select choices are set
+with user-event because jsdom cannot operate the OS select popup; time selection
+and confirmation are exercised with Tab, Space and Enter. Still test the full
+keyboard flow and focus appearance in a real browser.
+
+Work through availability first: several later tests need it before they can reach
+confirmation and recovery assertions. Add further tests at TODO 9.
 The build verifies the starter compiles; it does not imply the TODOs are complete.
