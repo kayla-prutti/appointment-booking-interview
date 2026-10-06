@@ -4,6 +4,7 @@ import type { Availability, BookingState, Selection } from "./types";
 /** YOUR INTERVIEW WORK LIVES HERE.
  * Search for TODO(interview) across src/. The mock API and visual shell are provided.
  * The starter intentionally does not fetch or confirm bookings yet.
+ * Implement the TODOs in numbered order. Start with #1 to load/select real slots.
  * Import mockApi / ApiError from './mockApi' when you start implementing.
  */
 export function useBooking() {
@@ -19,8 +20,15 @@ export function useBooking() {
     status: "idle",
   });
 
-  // TODO(interview)-1: When doctor/date change, clear the previous slot and booking
-  // feedback. Keep a successful booking's immutable snapshot until "Book another".
+  // TODO(interview)-1: Add an effect to call mockApi.getSlots when BOTH doctor and
+  // date exist. Set loading -> ready (including []) or error. Return to idle when
+  // inputs are incomplete. Cancel/ignore stale requests and handle StrictMode cleanup.
+  // mockApi.getSlots(doctorId, date, optionalAbortSignal) supports AbortController.
+
+  // TODO(interview)-2: When doctor/date change, clear the previous slot and booking
+  // feedback. After #1, select a time, then change doctor/date to verify it clears.
+  // Booking error/conflict feedback becomes testable after #4/#6; reset any existing
+  // feedback now, but keep a successful snapshot until "Book another".
   function chooseDoctor(doctorId: string) {
     setSelection((current) => ({ ...current, doctorId }));
   }
@@ -31,13 +39,8 @@ export function useBooking() {
     setSelection((current) => ({ ...current, slotId }));
   }
 
-  // TODO(interview)-2: Add an effect to call mockApi.getSlots when BOTH doctor and
-  // date exist. Set loading -> ready (including []) or error. Return to idle when
-  // inputs are incomplete. Cancel/ignore stale requests and handle StrictMode cleanup.
-  // mockApi.getSlots(doctorId, date, optionalAbortSignal) supports AbortController.
-
   // TODO(interview)-3: Retry availability without forcing the patient to reselect.
-  // Only the newest request may update availability. Consider sharing a loader with #2.
+  // Only the newest request may update availability. Consider sharing a loader with #1.
   function retryAvailability() {
     // Write your retry logic here.
   }

@@ -10,7 +10,8 @@ import type { Booking, Slot } from './types';
 import { useBooking } from './useBooking';
 
 // PROVIDED acceptance tests: these exercise your real hook and live interface.
-// They should fail until you implement the TODOs. The hook is never mocked.
+// They should fail until you implement the TODOs in numbered order.
+// Start with the [TODO 1] availability checks; the hook is never mocked.
 // TODO(interview)-9: Add further tests, e.g. conflict followed by a failing refresh,
 // reset while a request is pending, and stale errors after a doctor/date change.
 // Tests use a fresh real mock server with zero delay for speed and isolation;
@@ -66,7 +67,7 @@ afterEach(() => {
 });
 
 describe('candidate implementation acceptance (implement the TODOs to pass)', () => {
-  it('loads availability only after both doctor and date are selected [TODO 2]', async () => {
+  it('loads availability only after both doctor and date are selected [TODO 1]', async () => {
     const hook = setup();
     expect(getSlotsSpy).not.toHaveBeenCalled();
     act(() => hook.result.current.chooseDoctor('chen'));
@@ -78,7 +79,7 @@ describe('candidate implementation acceptance (implement the TODOs to pass)', ()
     expect(getSlotsSpy.mock.calls.every(([doctor, date]) => doctor === 'chen' && date === dates[0])).toBe(true);
   });
 
-  it('ignores an old slow response after switching dates [TODO 2]', async () => {
+  it('ignores an old slow response after switching dates [TODO 1]', async () => {
     const oldRequest = deferred<Slot[]>();
     const newRequest = deferred<Slot[]>();
     getSlotsSpy.mockImplementation((_doctor, date) => date === dates[0] ? oldRequest.promise : newRequest.promise);
@@ -95,7 +96,7 @@ describe('candidate implementation acceptance (implement the TODOs to pass)', ()
     expectReadySlots(hook, newerSlots);
   });
 
-  it('clears stale slot selections on both date and doctor changes [TODO 1]', async () => {
+  it('clears stale slot selections on both date and doctor changes [TODO 2]', async () => {
     const hook = setup();
     await selectFirstSlot(hook);
     expect(hook.result.current.selection.slotId).toBe(slots[0].id);
@@ -109,7 +110,7 @@ describe('candidate implementation acceptance (implement the TODOs to pass)', ()
     expect(hook.result.current.selection.slotId).toBe('');
   });
 
-  it('handles loading, empty, error and availability retry [TODO 2, 3]', async () => {
+  it('handles loading, empty, error and availability retry [TODO 1, 3]', async () => {
     const request = deferred<Slot[]>();
     getSlotsSpy.mockReturnValueOnce(request.promise);
     const hook = setup();
@@ -123,6 +124,19 @@ describe('candidate implementation acceptance (implement the TODOs to pass)', ()
     expect(hook.result.current.selection).toMatchObject({ doctorId: 'chen', date: dates[1] });
     act(() => { void hook.result.current.retryAvailability(); });
     await waitFor(() => expectReadySlots(hook, makeSlots('chen', dates[1])), timeout);
+  });
+
+  it('preserves selection after a network error and then confirms [TODO 4]', async () => {
+    server.setScenario('booking-error');
+    const hook = setup();
+    await selectFirstSlot(hook);
+    const selection = { ...hook.result.current.selection };
+    await act(async () => { await hook.result.current.confirm(); });
+    expect(hook.result.current.bookingState.status).toBe('error');
+    expect(hook.result.current.selection).toEqual(selection);
+    await act(async () => { await hook.result.current.confirm(); });
+    expect(hook.result.current.bookingState).toMatchObject({ status: 'success', booking: { slot: slots[0], doctor: doctors[0] } });
+    expect(confirmSpy).toHaveBeenCalledTimes(2);
   });
 
   it('blocks same-tick duplicate submissions and reuses the key on retry [TODO 4, 5]', async () => {
@@ -143,19 +157,6 @@ describe('candidate implementation acceptance (implement the TODOs to pass)', ()
     expect(hook.result.current.bookingState.status).toBe('success');
   });
 
-  it('preserves selection after a network error and then confirms [TODO 4]', async () => {
-    server.setScenario('booking-error');
-    const hook = setup();
-    await selectFirstSlot(hook);
-    const selection = { ...hook.result.current.selection };
-    await act(async () => { await hook.result.current.confirm(); });
-    expect(hook.result.current.bookingState.status).toBe('error');
-    expect(hook.result.current.selection).toEqual(selection);
-    await act(async () => { await hook.result.current.confirm(); });
-    expect(hook.result.current.bookingState).toMatchObject({ status: 'success', booking: { slot: slots[0], doctor: doctors[0] } });
-    expect(confirmSpy).toHaveBeenCalledTimes(2);
-  });
-
   it('refreshes a conflicting slot, preserves doctor/date and books an alternative [TODO 6]', async () => {
     server.setScenario('slot-taken');
     const hook = setup();
@@ -170,7 +171,7 @@ describe('candidate implementation acceptance (implement the TODOs to pass)', ()
     expect(confirmSpy.mock.calls[1][0].idempotencyKey).not.toBe(confirmSpy.mock.calls[0][0].idempotencyKey);
   });
 
-  it('announces async states and supports keyboard time selection and confirmation [TODO 2, 4, 8]', async () => {
+  it('announces async states and supports keyboard time selection and confirmation [TODO 1, 4, 8]', async () => {
     const availabilityRequest = deferred<Slot[]>();
     const bookingRequest = deferred<Booking>();
     getSlotsSpy.mockReturnValueOnce(availabilityRequest.promise);

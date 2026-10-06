@@ -15,7 +15,7 @@ npm run dev
 ```
 
 Open the local URL printed by Vite. The first screen is intentionally idle: choosing
-a doctor and date will not load slots until you implement TODO 2. The confirmation
+a doctor and date will not load slots until you implement TODO 1. The confirmation
 and retry handlers are also intentional stubs. Use **Preview provided UI states**
 to inspect the supplied design; previews disable booking and never call the API.
 Return to **Live exercise** to test your code.
@@ -29,10 +29,13 @@ and recovery when a slot is no longer available.
 
 ## Where to code
 
+Implement these in numbered order. TODO 1 loads slots so you can select a time;
+TODO 2 then clears that selection when you switch doctor/date.
+
 | Task | File | Work |
 | --- | --- | --- |
-| TODO 1 | `src/useBooking.ts` | Selection changes: clear stale time and feedback |
-| TODO 2 | `src/useBooking.ts` | Load availability, cleanup and stale response handling |
+| TODO 1 | `src/useBooking.ts` | Load availability, cleanup and stale response handling |
+| TODO 2 | `src/useBooking.ts` | Selection changes: clear stale time and feedback |
 | TODO 3 | `src/useBooking.ts` | Retry failed availability |
 | TODO 4 | `src/useBooking.ts` | Validate and confirm, preserve selection on error |
 | TODO 5 | `src/useBooking.ts` | Synchronous duplicate guard and stable retry key |
@@ -137,6 +140,26 @@ with user-event because jsdom cannot operate the OS select popup; time selection
 and confirmation are exercised with Tab, Space and Enter. Still test the full
 keyboard flow and focus appearance in a real browser.
 
-Work through availability first: several later tests need it before they can reach
-confirmation and recovery assertions. Add further tests at TODO 9.
+Start with **TODO 1**. To run its first check while you work:
+
+```bash
+npm run test:acceptance -- -t "loads availability"
+```
+
+After it loads slots, check stale response handling with:
+
+```bash
+npm run test:acceptance -- -t "ignores an old slow response"
+```
+
+Then implement **TODO 2** and run:
+
+```bash
+npm run test:acceptance -- -t "clears stale slot selections"
+```
+
+Continue with TODOs 3–8 in order. Existing booking error/conflict feedback is reset
+in TODO 2, but you will see those states once TODOs 4 and 6 can produce them.
+Later tests need availability before they can reach confirmation and recovery
+assertions. Add further tests at TODO 9.
 The build verifies the starter compiles; it does not imply the TODOs are complete.

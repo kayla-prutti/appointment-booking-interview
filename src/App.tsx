@@ -354,8 +354,8 @@ export default function App() {
             <p className="eyebrow">YOUR INTERVIEW WORKSPACE</p>
             <h2 id="practice-title">Make the flow work.</h2>
             <p>
-              The UI and mock API are ready. Implement the booking logic in the
-              numbered code comments.
+              The UI and mock API are ready. Start with TODO 1, then follow the
+              numbered code comments in order.
             </p>
             <div className="code-location">
               <span>START HERE</span>
@@ -363,11 +363,15 @@ export default function App() {
               <small>TODO(interview)-1 through -7</small>
             </div>
             <ol className="checklist">
-              <li>Connect availability & handle stale requests</li>
-              <li>Render loading, empty & error states</li>
-              <li>Confirm once & allow safe retry</li>
+              <li>Load availability & handle stale requests</li>
+              <li>Clear selected time when doctor/date changes</li>
+              <li>Retry availability errors</li>
+              <li>Confirm bookings & allow network retries</li>
+              <li>Prevent duplicate submissions</li>
               <li>Recover when a slot is taken</li>
+              <li>Start another booking</li>
               <li>Finish keyboard focus in App.tsx</li>
+              <li>Add more edge case tests</li>
             </ol>
             <div className="practice-controls">
               <label htmlFor="scenario">Mock API scenario</label>
